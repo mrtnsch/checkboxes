@@ -2,7 +2,8 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Checkbox Project</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WebSocket Checkbox Demo</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -35,63 +36,40 @@
         }
 
     </style>
-    <script>
-        let socket;
-
-        function setupWebSocket() {
-            socket = new WebSocket('ws://localhost:8080/ws/');
-
-            socket.onmessage = function (event) {
-                const state = JSON.parse(event.data);
-                const checkbox = document.getElementById(`checkbox-${state.index}`);
-                if (checkbox) {
-                    checkbox.checked = state.checked;
-                }
-            };
-
-            socket.onopen = function () {
-                console.log('WebSocket connection established');
-            };
-
-            socket.onclose = function () {
-                console.log('WebSocket connection closed');
-            };
-        }
-
-        function loadCheckboxes() {
-            const container = document.getElementById('checkbox-container');
-            container.innerHTML = '';
-
-            fetch('http://localhost:8080/checkboxes')
-                .then((res) => {
-                    res.json().then((data) => {
-                        const trueIndices = data.true_indices
-
-                        for (let i = 0; i < 1000; i++) {
-                            const checkbox = document.createElement('input');
-                            checkbox.type = 'checkbox';
-                            checkbox.id = `checkbox-${i}`;
-                            checkbox.checked = trueIndices.includes(i)
-                            checkbox.addEventListener('change', () => updateCheckbox(i, checkbox.checked));
-                            container.appendChild(checkbox);
-                            container.appendChild(document.createElement('br'));
-                        }
-                    })
-                })
-        }
-
-        function updateCheckbox(index, checked) {
-            const state = {index, checked};
-            socket.send(JSON.stringify(state));
-        }
-
-        window.onload = function () {
-            setupWebSocket();
-            loadCheckboxes();
-        };
-    </script>
 </head>
 <body>
 <div id="checkbox-container"></div>
+
+<script>
+    const socket = new WebSocket('ws://localhost:3030/ws');
+    const NUMBER_OF_CHECKBOXES = 1000;
+
+    socket.onmessage = function (event) {
+        if(event.data.includes("Checkbox updated: ")) {
+           const split = event.data.split(":")
+            const id = split[1].trim()
+            document.getElementById(`checkbox-${id}`).checked = split[2].trim()
+            return
+        }
+        const data = JSON.parse(event.data)
+        if (data.is_initial) loadCheckboxes(data.true_indices);
+    };
+
+
+    function loadCheckboxes(trueIndices) {
+        const container = document.getElementById('checkbox-container');
+        container.innerHTML = '';
+
+        for (let i = 0; i < NUMBER_OF_CHECKBOXES; i++) {
+            const checkbox = document.createElement('input');
+            checkbox.type = 'checkbox';
+            checkbox.id = `checkbox-${i}`;
+            checkbox.checked = trueIndices.includes(i)
+            checkbox.addEventListener('change', () => socket.send(`checkbox:${i}:${checkbox.checked}`));
+            container.appendChild(checkbox);
+            container.appendChild(document.createElement('br'));
+        }
+    }
+</script>
 </body>
 </html>
