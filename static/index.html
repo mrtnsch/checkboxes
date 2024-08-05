@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Checkbox Project</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        #checkbox-container {
+            width: 80%;
+            max-width: 1200px;
+            background: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            overflow-y: scroll;
+            height: 80vh;
+            display: flex;
+            flex-wrap: wrap;
+        }
+
+        #checkbox-container input[type="checkbox"] {
+            margin: 10px;
+            transform: scale(1.2);
+            cursor: pointer;
+        }
+
+    </style>
+    <script>
+        let socket;
+
+        function setupWebSocket() {
+            socket = new WebSocket('ws://localhost:8080/ws/');
+
+            socket.onmessage = function (event) {
+                const state = JSON.parse(event.data);
+                const checkbox = document.getElementById(`checkbox-${state.index}`);
+                if (checkbox) {
+                    checkbox.checked = state.checked;
+                }
+            };
+
+            socket.onopen = function () {
+                console.log('WebSocket connection established');
+            };
+
+            socket.onclose = function () {
+                console.log('WebSocket connection closed');
+            };
+        }
+
+        function loadCheckboxes() {
+            const container = document.getElementById('checkbox-container');
+            container.innerHTML = '';
+
+            fetch('http://localhost:8080/checkboxes')
+                .then((res) => {
+                    res.json().then((data) => {
+                        const trueIndices = data.true_indices
+
+                        for (let i = 0; i < 1000; i++) {
+                            const checkbox = document.createElement('input');
+                            checkbox.type = 'checkbox';
+                            checkbox.id = `checkbox-${i}`;
+                            checkbox.checked = trueIndices.includes(i)
+                            checkbox.addEventListener('change', () => updateCheckbox(i, checkbox.checked));
+                            container.appendChild(checkbox);
+                            container.appendChild(document.createElement('br'));
+                        }
+                    })
+                })
+        }
+
+        function updateCheckbox(index, checked) {
+            const state = {index, checked};
+            socket.send(JSON.stringify(state));
+        }
+
+        window.onload = function () {
+            setupWebSocket();
+            loadCheckboxes();
+        };
+    </script>
+</head>
+<body>
+<div id="checkbox-container"></div>
+</body>
+</html>
