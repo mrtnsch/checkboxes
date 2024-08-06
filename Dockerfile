@@ -1,5 +1,5 @@
 # Use the official Rust image as the base image
-FROM rust:1.70 as builder
+FROM rust:1.70 AS builder
 
 WORKDIR /app
 # Copy cargo files to container
