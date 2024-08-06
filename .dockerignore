@@ -1,0 +1,6 @@
+target
+data
+.gitignore
+.env
+readme.md
+docker-compose.yaml
