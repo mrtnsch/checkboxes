@@ -30,6 +30,7 @@ RUN groupadd $APP_USER \
     && mkdir -p ${APP}
 
 COPY --from=builder /app/target/release/checkboxes ${APP}/checkboxes
+COPY ./static ./static
 
 RUN chown -R $APP_USER:$APP_USER ${APP}
 
