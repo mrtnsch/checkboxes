@@ -4,9 +4,6 @@ FROM rust:1.70 as builder
 WORKDIR /app
 # Copy cargo files to container
 COPY Cargo.toml Cargo.lock ./
-# Copy entity and migration files into container to they can be built and cached
-COPY entity ./entity
-COPY migration ./migration
 
 # Create fake main.rs file in src and build
 RUN mkdir ./src && echo 'fn main() { println!("Dummy!"); }' > ./src/main.rs
