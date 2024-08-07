@@ -16,19 +16,6 @@ services:
       retries: 5
     ports:
       - 6379:6379
-  checkbox:
-    container_name: checkbox
-    hostname: checkbox
-    depends_on:
-      - valkey
-    image: mrtnschwz/checkboxes
-    environment:
-      REDIS_URL: "redis://valkey"
-      SERVER_PORT: 3030
-      REDIS_BITMAP_NAME: "mybitmap"
-      NUMBER_OF_CHECKBOXES: "1000"
-    ports:
-      - "3030:3030"
 
 networks:
   valkey_network:

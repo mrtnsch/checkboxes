@@ -41,9 +41,10 @@
 <div id="checkbox-container"></div>
 
 <script>
-    const socket = new WebSocket(`ws://${window.location.hostname}${window.location.pathname}/ws`);
-    const NUMBER_OF_CHECKBOXES = 1000;
 
+    const socket = new WebSocket(getWebsocketAdress());
+
+    const NUMBER_OF_CHECKBOXES = 1000;
     socket.onmessage = function (event) {
         if (event.data.includes("Checkbox updated: ")) {
             const split = event.data.split(":")
@@ -54,6 +55,13 @@
         const data = JSON.parse(event.data)
         if (data.is_initial) loadCheckboxes(data.true_indices);
     };
+
+    function getWebsocketAdress() {
+        const host = `${window.location.host}`;
+        let pathname = window.location.pathname;
+        if (!pathname.endsWith("/")) pathname += "/"
+        return `wss://${host}${pathname}ws`;
+    }
 
 
     function loadCheckboxes(trueIndices) {
