@@ -41,12 +41,12 @@
 <div id="checkbox-container"></div>
 
 <script>
-    const socket = new WebSocket('ws://localhost:3030/ws');
+    const socket = new WebSocket(`ws://${window.location.hostname}${window.location.pathname}/ws`);
     const NUMBER_OF_CHECKBOXES = 1000;
 
     socket.onmessage = function (event) {
-        if(event.data.includes("Checkbox updated: ")) {
-           const split = event.data.split(":")
+        if (event.data.includes("Checkbox updated: ")) {
+            const split = event.data.split(":")
             const id = split[1].trim()
             document.getElementById(`checkbox-${id}`).checked = split[2].trim()
             return
