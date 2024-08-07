@@ -1,4 +1,5 @@
 use warp::Filter;
+use warp::http::StatusCode;
 
 use crate::Clients;
 use crate::redis_handler::RedisHandler;
@@ -17,8 +18,9 @@ pub fn create_routes(
         });
 
     let static_files = warp::path::end().and(warp::fs::dir("static"));
+    let health_route = warp::path("health").map(|| StatusCode::OK);
 
-    ws_route.or(static_files)
+    ws_route.or(static_files).or(health_route)
 }
 
 fn with_clients(clients: Clients) -> impl Filter<Extract=(Clients,), Error=std::convert::Infallible> + Clone {

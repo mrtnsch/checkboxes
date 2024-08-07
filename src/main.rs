@@ -28,7 +28,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     println!("Server started at http://localhost:{}", CONFIG.server_port);
     warp::serve(warp_routes)
-        .run(([127, 0, 0, 1], CONFIG.server_port))
+        .run(([0, 0, 0, 0], CONFIG.server_port))
         .await;
 
     Ok(())
