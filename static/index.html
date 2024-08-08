@@ -49,7 +49,7 @@
         if (event.data.includes("Checkbox updated: ")) {
             const split = event.data.split(":")
             const id = split[1].trim()
-            document.getElementById(`checkbox-${id}`).checked = split[2].trim()
+            document.getElementById(`checkbox-${id}`).checked = (split[2].trim() === "true")
             return
         }
         const data = JSON.parse(event.data)
